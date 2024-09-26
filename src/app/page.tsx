@@ -1,115 +1,55 @@
 'use client';
 import Image from 'next/image';
-import styles from './page.module.css';
 import React from 'react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Home() {
+  const { data, status } = useSession();
   React.useEffect(() => {
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker
-          .register('/sw.js')
-          .then(function (registration) {
-            console.log(
-              'ServiceWorker registration successful with scope: ',
-              registration.scope,
-            );
-          })
-          .catch(function (err) {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-      });
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(function (registration) {
+          console.log(
+            'ServiceWorker registration successful with scope: ',
+            registration.scope,
+          );
+        })
+        .catch(function (err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
     }
   }, []);
 
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
+    <div>
+      {status === 'authenticated' ? (
+        <div>
+          <p>Hey! {data.user?.name}</p>
+          {/*NOTE: Uncomment below if needed */}
+          {/* <p>Session will be expired at: {data.expires}</p>
           <li>
-            Get started by editing <code>src/app/page.tsx</code>.
+            Access Token: {data.accessToken.slice(0, 3)} ...{' '}
+            {data.accessToken.slice(-3)}
           </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+          <li>
+            Id Token (JWT): {data.idToken.slice(0, 3)} ...{' '}
+            {data.idToken.slice(-3)}
+          </li>
+          <img
+            src={data.user?.image ?? ``}
+            alt=""
+            style={{ borderRadius: '50px' }}
+          /> */}
+          <div>
+            <button onClick={() => signOut()}>Logout</button>
+          </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      ) : (
+        <button onClick={() => signIn('google', {}, { prompt: 'login' })}>
+          Login in with Google
+        </button>
+      )}
     </div>
   );
 }
