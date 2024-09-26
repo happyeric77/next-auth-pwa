@@ -1,7 +1,27 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+import Image from 'next/image';
+import styles from './page.module.css';
+import React from 'react';
 
 export default function Home() {
+  React.useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .then(function (registration) {
+            console.log(
+              'ServiceWorker registration successful with scope: ',
+              registration.scope,
+            );
+          })
+          .catch(function (err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+  }, []);
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
