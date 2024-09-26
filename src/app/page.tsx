@@ -1,5 +1,6 @@
 'use client';
 import Image from 'next/image';
+import styles from './page.module.css';
 import React from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 
@@ -22,12 +23,19 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
-      {status === 'authenticated' ? (
-        <div>
-          <p>Hey! {data.user?.name}</p>
-          {/*NOTE: Uncomment below if needed */}
-          {/* <p>Session will be expired at: {data.expires}</p>
+    <div className={styles.page}>
+      <main className={styles.main}>
+        {status === 'authenticated' ? (
+          <div className={styles.profile}>
+            <p>Hey! {data.user?.name}</p>
+            <Image
+              src={data.user?.image ?? ``}
+              alt="pfp"
+              width={50}
+              height={50}
+            />
+            {/*NOTE: Uncomment below if needed */}
+            {/* <p>Session will be expired at: {data.expires}</p>
           <li>
             Access Token: {data.accessToken.slice(0, 3)} ...{' '}
             {data.accessToken.slice(-3)}
@@ -35,21 +43,25 @@ export default function Home() {
           <li>
             Id Token (JWT): {data.idToken.slice(0, 3)} ...{' '}
             {data.idToken.slice(-3)}
-          </li>
-          <img
-            src={data.user?.image ?? ``}
-            alt=""
-            style={{ borderRadius: '50px' }}
-          /> */}
-          <div>
-            <button onClick={() => signOut()}>Logout</button>
+          </li> */}
           </div>
-        </div>
-      ) : (
-        <button onClick={() => signIn('google', {}, { prompt: 'login' })}>
-          Login in with Google
-        </button>
-      )}
+        ) : null}
+        {status === 'loading' ? 'Loading...' : null}
+      </main>
+      <footer className={styles.footer}>
+        <Image
+          src="/icon-128x128.png"
+          alt="Footer icon"
+          width={16}
+          height={16}
+        />
+        {status === 'authenticated' ? (
+          <a onClick={() => signOut()}>Logout</a>
+        ) : null}
+        {status === 'unauthenticated' ? (
+          <a onClick={() => signIn()}>Login</a>
+        ) : null}
+      </footer>
     </div>
   );
 }
